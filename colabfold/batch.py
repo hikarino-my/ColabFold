@@ -1205,6 +1205,7 @@ def run(
     stop_at_score_below: float = 0,
     dpi: int = 200,
     max_msa: str = None,
+    msa_only: bool = False,
 ):
     from alphafold.notebooks.notebook_utils import get_pae_json
     from colabfold.alphafold.models import load_models_and_params
@@ -1345,6 +1346,8 @@ def run(
             result_dir.joinpath(jobname + ".a3m").write_text(msa)
         except Exception as e:
             logger.exception(f"Could not get MSA/templates for {jobname}: {e}")
+            continue
+        if msa_only:
             continue
         try:
             (input_features, domain_names) = generate_input_feature(
@@ -1689,6 +1692,10 @@ def main():
         "--overwrite-existing-results", default=False, action="store_true"
     )
 
+    parser.add_argument(
+        "--msa-only", default=False, action="store_true"
+    )
+
     args = parser.parse_args()
 
     setup_logging(Path(args.results).joinpath("log.txt"))
@@ -1754,6 +1761,7 @@ def main():
         max_msa=args.max_msa,
         use_gpu_relax=args.use_gpu_relax,
         stop_at_score_below=args.stop_at_score_below,
+        msa_only=args.msa_only,
     )
 
 
